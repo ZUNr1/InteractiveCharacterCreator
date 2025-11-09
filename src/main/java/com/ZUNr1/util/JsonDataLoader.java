@@ -7,14 +7,13 @@ import com.ZUNr1.model.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JsonDataLoader {
     private static final ObjectMapper mapper = new ObjectMapper();
-    //ObjectMapper
+    //ObjectMapper是jackson的类，用于序列化与反序列化，实现json和Java互转的类
     static {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
         // 配置：忽略JSON中的未知字段
