@@ -17,7 +17,8 @@ public enum Afflatus {
         this.chineseName = chineseName;
     }
     //根据type信息找对应值
-    public Afflatus fromType(int type){
+    public static Afflatus fromType(int type){
+        //注意，这里应该是静态的，不需要实例就可以
         for (Afflatus afflatus : values()){
             //values()是遍历枚举类的数组，set遍历中for each直接用set本身就行，map遍历用keySet()
             if (afflatus.type == type){

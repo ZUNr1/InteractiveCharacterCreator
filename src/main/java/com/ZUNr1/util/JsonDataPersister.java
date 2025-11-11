@@ -26,6 +26,9 @@ public class JsonDataPersister {
     public static void saveCharacters(List<JsonDataLoader.CharactersJson> characters,String filePath){
         //这个方法是实际保存的方法，我们直接调用这个方法可以实现指定目录位置的保存，
         // 也可以使用上一个方法，那个默认路径的保存，这是重载的好处
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new IllegalArgumentException("文件路径不能为空");
+        }
         try {
             JsonDataLoader.CharactersData charactersData = new JsonDataLoader.CharactersData();
             //创建了一个容器类对象，为了储存参数的这个list

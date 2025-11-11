@@ -57,7 +57,7 @@ public abstract class Individual {
             if (name == null || name.trim().isEmpty()){//trim()先去掉空格再比较
                 throw new IllegalArgumentException("姓名不能为空");
             }
-            if (name.length() > 10){
+            if (name.trim().length() > 10){//注意啊，要验证的是去除空格后的长度
                 throw new IllegalArgumentException("姓名长度不能超过10位");
             }
             if (level <= 0 || level > 200){

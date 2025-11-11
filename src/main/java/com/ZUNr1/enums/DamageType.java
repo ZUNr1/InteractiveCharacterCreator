@@ -10,7 +10,8 @@ public enum DamageType {
         this.type = type;
         this.chineseName = chineseName;
     }
-    public DamageType fromType(int type){
+    public static DamageType fromType(int type){
+        //同样，是静态的
         for (DamageType damageType : values()){
             if (damageType.type == type){
                 return damageType;

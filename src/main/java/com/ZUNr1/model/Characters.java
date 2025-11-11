@@ -97,6 +97,8 @@ public final class Characters extends Individual{
         //使用private，强制使用builder来构造
         super(charactersBuilder);
         //子类cB含有父类B的所有字段，是父类的具体实现，所以传入cB而不是B
+        this.inheritance = charactersBuilder.inheritance;
+        this.portrait = charactersBuilder.portrait;
         this.otherInformation = charactersBuilder.otherInformation;
         this.rarity = charactersBuilder.rarity;
         //对额外字段赋值
