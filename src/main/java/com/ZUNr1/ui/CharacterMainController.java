@@ -216,4 +216,5 @@ public class CharacterMainController {
     public BorderPane getRoot() {
         return root;
     }
+
 }
