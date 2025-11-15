@@ -6,10 +6,37 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CharacterMainController {
     private BorderPane root;
+
+    // 基本信息
+    private TextField idField;
+    private TextField nameField;
+    private ComboBox<String> genderComboBox;
+    private ComboBox<String> afflatusComboBox;
+    private ComboBox<String> damageTypeComboBox;
+    private Spinner<Integer> raritySpinner;
+
+    // 属性信息
+    private TextField healthField;
+    private TextField attackField;
+    private TextField realityDefenseField;
+    private TextField mentalDefenseField;
+    private TextField techniqueField;
+
+    //技能信息
+    private Map<String,TextField> skillNameFields = new HashMap<>();
+    private Map<String,Map<String, TextArea>> skillDescribeFields = new HashMap<>(); // 技能 -> 星级 -> 描述
+    private Map<String,Map<String, TextArea>> skillStoryFields = new HashMap<>();    // 技能 -> 星级 -> 故事
+    private Map<String,Map<String, ComboBox<String>>> skillTypeFields = new HashMap<>(); // 技能 -> 星级 -> 类型
+
+    //传承与塑造
+    private Map<String,TextArea> inheritanceFields = new HashMap<>();
+    private Map<String,TextArea> portraitFields = new HashMap<>();
 
     public CharacterMainController(){
         createInterface();
@@ -67,7 +94,7 @@ public class CharacterMainController {
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         Label idLabel = new Label("角色id");
-        TextField idField = new TextField();
+        idField = new TextField();
         idField.setPromptText("请输入角色id（最多10个字符）");
         //下一行代码，使用了属性变化监听器，textProperty获得这个文本，
         // 设置addListener监听，里面一个lambda表达式，监听文本的变化做出行动
@@ -85,7 +112,7 @@ public class CharacterMainController {
                 });
 
         Label nameLabel = new Label("角色姓名");
-        TextField nameField = new TextField();
+        nameField = new TextField();
         nameField.setPromptText("请输入角色姓名（最多20个字符）");
         nameField.textProperty().addListener
                 ((observable,oldValue,newValue ) ->{
@@ -98,23 +125,23 @@ public class CharacterMainController {
         //下一行代码是数字选择器 (Spinner)
         //new Spinner<>(最小值, 最大值, 初始值)
         //可以设置输入的数字的最大值最小值还有初始值
-        Spinner raritySpinner = new Spinner<>(2,6,6);
+        raritySpinner = new Spinner<>(2,6,6);
         raritySpinner.setEditable(true);
         //允许用户直接在 Spinner 的文本框中输入数值，而不仅仅是通过上下箭头按钮来调整。
 
         Label genderLabel = new Label("角色性别");
         //下一行代码是下拉选择框 (ComboBox) ，产生下拉选择框选，getItems().setAll可以设置选项的名字
-        ComboBox<String> genderComboBox = new ComboBox<>();
+        genderComboBox = new ComboBox<>();
         genderComboBox.getItems().setAll("男","女","其他");
         genderComboBox.setPromptText("请选择角色性别");
 
         Label afflatusLabel = new Label("灵感类型");
-        ComboBox<String> afflatusComboBox = new ComboBox<>();
+        afflatusComboBox = new ComboBox<>();
         afflatusComboBox.getItems().setAll("星系","岩系","兽系","木系","灵系","智系");
         afflatusComboBox.setPromptText("请选择角色灵感类型");
 
         Label damageTypeLabel = new Label("角色创伤类型");
-        ComboBox<String> damageTypeComboBox = new ComboBox<>();
+        damageTypeComboBox = new ComboBox<>();
         damageTypeComboBox.getItems().setAll("现实创伤","精神创伤","本源创伤");
         damageTypeComboBox.setPromptText("请选择角色创伤类型");
 
@@ -149,7 +176,7 @@ public class CharacterMainController {
         col2.setHgrow(Priority.NEVER);
         //限制不扩展，优先级低的操作不能改变布局
         //Always是尽可能扩展到最大
-        col2.setPrefWidth(200);
+        col2.setPrefWidth(300);
         //设置首选的宽度（长度）
         //布局优先级顺序：
         //1.  ColumnConstraints/RowConstraints (最高优先级)
@@ -169,18 +196,12 @@ public class CharacterMainController {
 
         //额外技能区域
         Label extraSkillsNameLabel = new Label("额外神秘术");
-        content.add(extraSkillsNameLabel,0,currentRow,2,1);
-        //涵盖两列
-
         Button extraSkillsAdd = new Button("+ 添加额外技能");
-        content.add(extraSkillsAdd,1,currentRow,2,1);
-        currentRow++;
 
         VBox extraSkillsContainer = new VBox(10);//间距10像素
         //将其所有子节点（控件）在垂直方向（Vertical）上一个接一个地排列。
         //这个布局接收所有可能的额外技能，添加额外技能就在这个布局上修改
         extraSkillsContainer.setStyle("-fx-padding: 10px; -fx-border-color: #bdc3c7; -fx-border-width: 1;");
-        content.add(extraSkillsContainer,0,currentRow,2,1);
 
         extraSkillsAdd.setOnAction(actionEvent -> addExtraSkills(extraSkillsContainer));
 
@@ -195,9 +216,6 @@ public class CharacterMainController {
         scrollPane.setStyle("-fx-background: white; -fx-border-color: #bdc3c7; -fx-border-width: 1;");
         content.add(scrollPane,0,currentRow,2,1);
         currentRow++;
-
-
-
 
         return content;
     }
@@ -221,18 +239,33 @@ public class CharacterMainController {
         Label nameLabel = new Label("神秘术名称");
         TextField nameField = new TextField();
         nameField.setPromptText("请输入" + skillInformation + "名称");
+        this.skillNameFields.put(skillInformation,nameField);
         skillPane.add(nameLabel,0,row);
         skillPane.add(nameField,1,row);
         row++;
 
-        skillPane.add(createSkillLevelSection("一星牌"),0,row,2,1);
-        row += 4;
-        skillPane.add(createSkillLevelSection("二星牌"),0,row,2,1);
-        row += 4;
-        skillPane.add(createSkillLevelSection("三星牌"),0,row,2,1);
+        // 初始化嵌套Map
+        Map<String, TextArea> describeMap = new HashMap<>();
+        Map<String, TextArea> storyMap = new HashMap<>();
+        Map<String, ComboBox<String>> typeMap = new HashMap<>();
+
+        String[] skillLevels = {"一星牌","二星牌","三星牌"};
+
+        for (String skillLevel : skillLevels){
+            skillPane.add(createSkillLevelSection(skillLevel,describeMap,storyMap,typeMap),0,row,2,1);
+            row += 4;
+        }
+        // 存储到对应的Map中
+        this.skillDescribeFields.put(skillInformation, describeMap);
+        //使用神秘术I这样的名字作为key
+        this.skillStoryFields.put(skillInformation, storyMap);
+        this.skillTypeFields.put(skillInformation, typeMap);
+
         return skillPane;
     }
-    private GridPane createSkillLevelSection(String skillLevel){
+    private GridPane createSkillLevelSection
+            (String skillLevel, Map<String, TextArea> describeMap,
+             Map<String, TextArea> storyMap, Map<String, ComboBox<String>> typeMap) {
         GridPane levelPane = new GridPane();
         levelPane.setHgap(10);
         levelPane.setVgap(8);
@@ -255,6 +288,10 @@ public class CharacterMainController {
         //设置初始行数row为4行
         describeArea.setWrapText(true);
         //设置自动换行，当输入不能一行显示，就换行
+
+        describeMap.put(skillLevel, describeArea);
+        //存储的是 TextField对象的引用（内存地址），而不是TextField的当前文本值。因此会收集到值
+
         levelPane.add(describeLabel,0,levelRow);
         levelPane.add(describeArea,1,levelRow);
         levelRow++;
@@ -264,6 +301,10 @@ public class CharacterMainController {
         storyArea.setPromptText("输入" + skillLevel + "背景故事");
         storyArea.setPrefRowCount(2);
         storyArea.setWrapText(true);
+
+        storyMap.put(skillLevel, storyArea);
+
+
         levelPane.add(storyLabel,0,levelRow);
         levelPane.add(storyArea,1,levelRow);
         levelRow++;
@@ -271,13 +312,20 @@ public class CharacterMainController {
         Label typeLabel = new Label("神秘术类型");
         ComboBox<String> skillTypeComBox = new ComboBox<>();
         skillTypeComBox.getItems().addAll("攻击","增益","减益","治疗","吟诵","特殊","即兴咒语");
+
+        typeMap.put(skillLevel, skillTypeComBox);
+
         levelPane.add(typeLabel,0,levelRow);
         levelPane.add(skillTypeComBox,1,levelRow);
 
         return levelPane;
     }
     private void addExtraSkills(VBox container){
-        GridPane extraSkillPane = createDetailedSkillPanel("额外神秘术");
+        String extraSkillName = "额外神秘术_" + (System.currentTimeMillis());
+        //System.currentTimeMillis()可以创建当前事件的时间戳，也就是显示创建时的时间字符串
+        // 这个的目的是让createDetailedSkillPanel方法的名字唯一
+        //因为我需要存储到Map中，这个时候key就要不同，如果加的额外神秘术都是一个名字，就无法唯一
+        GridPane extraSkillPane = createDetailedSkillPanel(extraSkillName);
 
         Button removeExtraSkill = new Button("删除");
         removeExtraSkill.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
@@ -293,6 +341,12 @@ public class CharacterMainController {
                     //删除这个组件，skillSelection不再被container引用
                     //所以后续代码还会执行，但是不再关联container
                     //注意，与container直接管联的是skillSelection而不是extraSkillPane
+
+                    // 从所有Map中移除对应的数据
+                    skillNameFields.remove(extraSkillName);
+                    skillDescribeFields.remove(extraSkillName);
+                    skillStoryFields.remove(extraSkillName);
+                    skillTypeFields.remove(extraSkillName);
                 });
     }
 
@@ -307,19 +361,19 @@ public class CharacterMainController {
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         Label healthLabel = new Label("生命值");
-        TextField healthField = attributesInput(30000,0,"10000");
+        healthField = attributesInput(30000,0,"10000");
 
         Label attackLabel = new Label("攻击力");
-        TextField attackField = attributesInput(2000,0,"1000");
+        attackField = attributesInput(2000,0,"1000");
 
         Label realityDefenseLabel = new Label("现实防御");
-        TextField realityDefenseField = attributesInput(2000,0,"500");
+        realityDefenseField = attributesInput(2000,0,"500");
 
         Label mentalDefenseLabel = new Label("精神防御");
-        TextField mentalDefenseField = attributesInput(2000,0,"500");
+        mentalDefenseField = attributesInput(2000,0,"500");
 
         Label techniqueLabel = new Label("暴击技巧");
-        TextField techniqueField = attributesInput(2000,0,"500");
+        techniqueField = attributesInput(2000,0,"500");
 
         content.add(titleLabel, 0, 0, 2, 1);
         content.add(healthLabel, 0, 1);
@@ -367,8 +421,92 @@ public class CharacterMainController {
                 });
         return field;
     }
-    private VBox createOtherInformationTab(){
-        return new VBox(new Label("开发中"));
+    private ScrollPane createOtherInformationTab(){
+        GridPane content = new GridPane();
+        content.setHgap(10);
+        content.setVgap(15);
+        content.setPadding(new Insets(20));
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setHgrow(Priority.NEVER);
+        col1.setPrefWidth(100);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setHgrow(Priority.NEVER);
+        col2.setPrefWidth(300);
+        content.getColumnConstraints().addAll(col1,col2);
+
+        int currentRow = 0;
+        // 标题
+        Label titleLabel = new Label("塑造与传承信息");
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        content.add(titleLabel, 0, currentRow, 2, 1);
+        currentRow++;
+
+        // 传承部分
+        Label inheritanceTitle = new Label("传承信息");
+        inheritanceTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        content.add(inheritanceTitle, 0, currentRow, 2, 1);
+        currentRow++;
+
+        Label inheritanceNameLabel = new Label("传承名称");
+        TextArea inheritanceNameField = new TextArea();
+        inheritanceNameField.setPromptText("请输入传承名称");
+        inheritanceNameField.setPrefRowCount(1);
+        inheritanceNameField.setWrapText(true);
+        inheritanceFields.put("inheritance",inheritanceNameField);
+        content.add(inheritanceNameLabel,0,currentRow);
+        content.add(inheritanceNameField,1,currentRow);
+        currentRow++;
+
+        String[] inheritanceLevels = {"基础传承", "一阶传承", "二阶传承", "三阶传承"};
+        String[] inheritanceKeys = {"basicInheritance", "firstInheritance", "secondInheritance", "thirdInheritance"};
+        for (int i = 0;i < inheritanceLevels.length;i++){
+            Label levelLabel = new Label(inheritanceLevels[i]);
+            TextArea inheritanceArea = new TextArea();
+            inheritanceArea.setPromptText("请输入" + inheritanceLevels[i] + "效果描述");
+            inheritanceArea.setPrefRowCount(3);
+            inheritanceArea.setWrapText(true);
+            inheritanceFields.put(inheritanceKeys[i],inheritanceArea);
+            content.add(levelLabel,0,currentRow);
+            content.add(inheritanceArea,1,currentRow);
+            currentRow++;
+        }
+        currentRow++;
+
+        Label portraitTitle = new Label("塑造信息");
+        portraitTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        content.add(portraitTitle,0,currentRow,2,1);
+        currentRow++;
+
+        Label portraitDescribeLabel = new Label("塑造描述");
+        TextArea portraitDescribeArea = new TextArea();
+        portraitDescribeArea.setPromptText("请输入塑造物品的文案");
+        portraitDescribeArea.setPrefRowCount(2);
+        portraitDescribeArea.setWrapText(true);
+        portraitFields.put("portraitDescribe", portraitDescribeArea);
+        content.add(portraitDescribeLabel,0,currentRow);
+        content.add(portraitDescribeArea,1,currentRow);
+        currentRow++;
+
+        // 各级塑造
+        String[] portraitLevels = {"一阶塑造", "二阶塑造", "三阶塑造", "四阶塑造", "五阶塑造"};
+        String[] portraitKeys = {"firstPortrait", "secondPortrait", "thirdPortrait", "fourthPortrait", "fifthPortrait"};
+        for (int i = 0;i < portraitLevels.length;i++){
+            Label levelLabel = new Label(portraitLevels[i]);
+            TextArea portraitArea = new TextArea();
+            portraitArea.setPrefRowCount(3);
+            portraitArea.setWrapText(true);
+            portraitFields.put(portraitKeys[i],portraitArea);
+            content.add(levelLabel,0,currentRow);
+            content.add(portraitArea,1,currentRow);
+            currentRow++;
+        }
+
+        ScrollPane scrollPane = new ScrollPane(content);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(400);
+        scrollPane.setStyle("-fx-background: white; -fx-border-color: #bdc3c7;");
+        return scrollPane;
     }
     private VBox createUsedTermInformationTab(){
         return new VBox(new Label("开发中"));
