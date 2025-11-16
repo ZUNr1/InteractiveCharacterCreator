@@ -95,6 +95,7 @@ public class CharacterMainController {
         setUpWindowsCloseHandle();
         //设置关闭窗口时的操作
     }
+
     private void setUpWindowsCloseHandle(){
         Platform.runLater(() -> {
             // 这行代码的意思是："等当前代码执行完后，在JavaFX应用线程中执行括号里的代码"
@@ -115,6 +116,7 @@ public class CharacterMainController {
         });
 
     }
+
     private void showExitConfirmation() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("退出程序");
@@ -132,6 +134,7 @@ public class CharacterMainController {
         }
         // 如果点击"再陪陪你"或关闭对话框，什么都不做（窗口保持打开）
     }
+
     private HBox createButtonBox(){
         HBox buttonBox = new HBox(20);
         buttonBox.setPadding(new Insets(15));
@@ -150,9 +153,15 @@ public class CharacterMainController {
         buttonBox.getChildren().addAll(confirmButton,clearButton);
         return buttonBox;
     }
+
     private void confirmInput(){
+        Validator validator = new Validator();
+        if (!validator.validateRequiredFields(this)){
+            return;
+        }
 
     }
+
     private void createNewCharacter(){
         try {
 
@@ -187,6 +196,7 @@ public class CharacterMainController {
             e.printStackTrace();
         }
     }
+
     private void reuseCurrentWindows(){
         Stage currentStage = (Stage) root.getScene().getWindow();
         //getScene() 返回这个组件所在的 Scene 对象(CharacterApp类里面的scene)
@@ -740,7 +750,6 @@ public class CharacterMainController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 
     public BorderPane getRoot() {
         return root;
