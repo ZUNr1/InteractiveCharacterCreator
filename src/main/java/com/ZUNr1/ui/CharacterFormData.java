@@ -12,6 +12,7 @@ public class CharacterFormData {
     // 基本信息
     private String id;
     private String name;
+    private String enName;
     private boolean isCustom;
     private String creator;
     private Gender gender;
@@ -50,6 +51,19 @@ public class CharacterFormData {
     // 专有名词
     private Map<String, String> usedTerms; // Map<"术语名", "术语描述">
 
+    // 狂想信息
+    private Map<String, Map<String, String>> euphoriaDescribes; // 狂想ID -> 等级 -> 描述
+    private Map<String, Map<String, Integer>> euphoriaAttributes; // 狂想ID -> 属性类型 -> 数值
+
+    // 其他信息
+    private String introduction;
+    private String size;
+    private String fragrance;
+    private String detailedAfflatus;
+    private Map<String, String> dressNames; // 服装ID -> 服装名称
+    private Map<String, Map<String, String>> characterItems; // 单品ID -> 字段类型 -> 内容
+    private Map<String, String> storyNames; // 文化ID -> 文化名称
+    private Map<String, String> storyDescribes; // 文化ID -> 文化描述
     // 构造器
     public CharacterFormData() {}
 
@@ -282,5 +296,69 @@ public class CharacterFormData {
 
     public void setUsedTerms(Map<String, String> usedTerms) {
         this.usedTerms = usedTerms;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getFragrance() {
+        return fragrance;
+    }
+
+    public void setFragrance(String fragrance) {
+        this.fragrance = fragrance;
+    }
+
+    public String getDetailedAfflatus() {
+        return detailedAfflatus;
+    }
+
+    public void setDetailedAfflatus(String detailedAfflatus) {
+        this.detailedAfflatus = detailedAfflatus;
+    }
+
+    public Map<String, String> getDressNames() {
+        return dressNames;
+    }
+
+    public void setDressNames(Map<String, String> dressNames) {
+        this.dressNames = dressNames;
+    }
+
+    public Map<String, Map<String, String>> getCharacterItems() {
+        return characterItems;
+    }
+
+    public void setCharacterItems(Map<String, Map<String, String>> characterItems) {
+        this.characterItems = characterItems;
+    }
+
+    public Map<String, String> getStoryNames() {
+        return storyNames;
+    }
+
+    public void setStoryNames(Map<String, String> storyNames) {
+        this.storyNames = storyNames;
+    }
+
+    public Map<String, String> getStoryDescribes() {
+        return storyDescribes;
+    }
+
+    public void setStoryDescribes(Map<String, String> storyDescribes) {
+        this.storyDescribes = storyDescribes;
     }
 }

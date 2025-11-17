@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import java.util.Map;
 
 public class Validator {
-    public boolean validateRequiredFields(CharacterMainController controller){
+    public static boolean validateRequiredFields(CharacterMainController controller){
         if (!validateBasicInformation(controller)){
             return false;
         }
@@ -65,6 +65,11 @@ public class Validator {
             controller.getNameField().requestFocus();
             return false;
         }
+        if (controller.getEnNameField().getText() == null || controller.getEnNameField().getText().trim().isEmpty()) {
+            showValidationAlert("角色英文姓名不能为空");
+            controller.getEnNameField().requestFocus();
+            return false;
+        }
         if (controller.getRaritySpinner().getValue() == null){
             showValidationAlert("请选择稀有度");
             controller.getRaritySpinner().requestFocus();
@@ -108,7 +113,7 @@ public class Validator {
         }
         return true;
     }
-    private boolean validateSkillsInformation(CharacterMainController controller){
+    private static boolean validateSkillsInformation(CharacterMainController controller){
         if (!validateSkillName(controller.getSkillNameFields().get("神秘术I"), "神秘术I")) {
             return false;
         }

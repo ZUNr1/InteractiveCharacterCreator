@@ -53,6 +53,7 @@ public class JsonDataLoader {
         //这个内部类是存放从json中读取到的Character类型，分类放好
         public String id;
         public String name;
+        public String enName;
         public Gender gender;
         public boolean isCustom;
         public String creator;

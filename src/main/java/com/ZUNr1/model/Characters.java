@@ -57,8 +57,8 @@ public final class Characters extends Individual {
         private OtherInformation otherInformation;
         private int rarity;
 
-        public CharactersBuilder(String id, String name, Gender gender,boolean isCustom,String creator) {
-            super(id, name, gender,isCustom,creator);
+        public CharactersBuilder(String id, String name, String enName,Gender gender,boolean isCustom,String creator) {
+            super(id, name,enName,gender,isCustom,creator);
             //继承
         }
 

@@ -19,6 +19,7 @@ public class CharacterMainController {
     // 基本信息
     private TextField idField;
     private TextField nameField;
+    private TextField enNameField;
     private TextField creatorField;
     private ComboBox<String> genderComboBox;
     private ComboBox<String> afflatusComboBox;
@@ -47,6 +48,12 @@ public class CharacterMainController {
 
     private Map<String,Map<String,TextArea>> euphoriaDescribeFields = new HashMap<>();
     private Map<String,Map<String,TextField>> euphoriaAttributesFields = new HashMap<>();
+
+    // 其他信息字段
+    private Map<String, TextArea> characterCoverInformationFields = new HashMap<>();
+    private Map<String, TextField> dressNameFields = new HashMap<>();
+    private Map<String, Map<String, TextArea>> characterItemsFields = new HashMap<>();
+    private Map<String, Map<String, TextArea>> characterStoryFields = new HashMap<>();
 
     public CharacterMainController(){
         createInterface();
@@ -78,9 +85,9 @@ public class CharacterMainController {
         attributesInformationTab.setContent(createAttributesInformationTab());
         attributesInformationTab.setClosable(false);
         //包含属性
-        Tab ProgressionInformationTab = new Tab("塑造与传承");
-        ProgressionInformationTab.setContent(createProgressionInformationTab());
-        ProgressionInformationTab.setClosable(false);
+        Tab progressionInformationTab = new Tab("塑造与传承");
+        progressionInformationTab.setContent(createProgressionInformationTab());
+        progressionInformationTab.setClosable(false);
         //包含Portrait和Inheritance
         Tab usedTermInformationTab = new Tab("专有名词");
         usedTermInformationTab.setContent(createUsedTermInformationTab());
@@ -88,10 +95,14 @@ public class CharacterMainController {
         //包含usedTerm
         Tab euphoriaInformationTab = new Tab("狂想");
         euphoriaInformationTab.setContent(createEuphoriaInformationTab());
+        euphoriaInformationTab.setClosable(false);
+        Tab otherInformationTab = new Tab("其他信息");
+        otherInformationTab.setContent(createOtherInformationTab());
+        otherInformationTab.setClosable(false);
         tabPane.getTabs().addAll
                 (basicInformationTab,skillInformationTab,attributesInformationTab,
-                        ProgressionInformationTab,usedTermInformationTab,
-                        euphoriaInformationTab);
+                        progressionInformationTab,usedTermInformationTab,
+                        euphoriaInformationTab,otherInformationTab);
         //这一行获得所有标签然后添加所有我们要加的标签
         root.setCenter(tabPane);
 
@@ -101,7 +112,6 @@ public class CharacterMainController {
         setUpWindowsCloseHandle();
         //设置关闭窗口时的操作
     }
-
     private void setUpWindowsCloseHandle(){
         Platform.runLater(() -> {
             // 这行代码的意思是："等当前代码执行完后，在JavaFX应用线程中执行括号里的代码"
@@ -122,7 +132,6 @@ public class CharacterMainController {
         });
 
     }
-
     private void showExitConfirmation() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("退出程序");
@@ -140,7 +149,6 @@ public class CharacterMainController {
         }
         // 如果点击"再陪陪你"或关闭对话框，什么都不做（窗口保持打开）
     }
-
     private HBox createButtonBox(){
         HBox buttonBox = new HBox(20);
         buttonBox.setPadding(new Insets(15));
@@ -159,15 +167,12 @@ public class CharacterMainController {
         buttonBox.getChildren().addAll(confirmButton,clearButton);
         return buttonBox;
     }
-
     private void confirmInput(){
-        Validator validator = new Validator();
-        if (!validator.validateRequiredFields(this)){
+        if (!Validator.validateRequiredFields(this)){
             return;
         }
 
     }
-
     private void createNewCharacter(){
         try {
 
@@ -202,7 +207,6 @@ public class CharacterMainController {
             e.printStackTrace();
         }
     }
-
     private void reuseCurrentWindows(){
         Stage currentStage = (Stage) root.getScene().getWindow();
         //getScene() 返回这个组件所在的 Scene 对象(CharacterApp类里面的scene)
@@ -232,6 +236,7 @@ public class CharacterMainController {
 
 
     }
+
 
     private GridPane createBasicInformationTab(){
         GridPane content = new GridPane();//GridPane布局可以像表格一样划分
@@ -283,6 +288,16 @@ public class CharacterMainController {
                     }
                 });
 
+        Label enNameLabel = new Label("角色英文姓名");
+        enNameField = new TextField();
+        enNameField.setPromptText("请输入角色英文姓名（最多40个字符）");
+        enNameField.textProperty().addListener
+                ((observable,oldValue,newValue ) ->{
+                    if (newValue.length() > 40){
+                        enNameField.setText(newValue.substring(0,40));
+                    }
+                });
+
         Label rarityLabel = new Label("稀有度");
         //下一行代码是数字选择器 (Spinner)
         //new Spinner<>(最小值, 最大值, 初始值)
@@ -314,18 +329,21 @@ public class CharacterMainController {
         content.add(idField,1,1);
         content.add(nameLabel,0,2);
         content.add(nameField,1,2);
-        content.add(rarityLabel,0,3);
-        content.add(raritySpinner,1,3);
-        content.add(genderLabel, 0, 4);
-        content.add(genderComboBox, 1, 4);
-        content.add(afflatusLabel,0,5);
-        content.add(afflatusComboBox,1,5);
-        content.add(damageTypeLabel,0,6);
-        content.add(damageTypeComboBox,1,6);
-        content.add(creatorLabel,0,7);
-        content.add(creatorField,1,7);
+        content.add(enNameLabel,0,3);
+        content.add(enNameField,1,3);
+        content.add(rarityLabel,0,4);
+        content.add(raritySpinner,1,4);
+        content.add(genderLabel, 0, 5);
+        content.add(genderComboBox, 1, 5);
+        content.add(afflatusLabel,0,6);
+        content.add(afflatusComboBox,1,6);
+        content.add(damageTypeLabel,0,7);
+        content.add(damageTypeComboBox,1,7);
+        content.add(creatorLabel,0,8);
+        content.add(creatorField,1,8);
         return content;
     }
+
 
     private GridPane createSkillInformationTab(){
         //嵌套布局，GirdPane包住ScrollPane包住skillsContainer
@@ -385,7 +403,6 @@ public class CharacterMainController {
 
         return content;
     }
-
     private GridPane createDetailedSkillPanel(String skillInformation){
         GridPane skillPane = new GridPane();
         skillPane.setHgap(10);
@@ -430,7 +447,6 @@ public class CharacterMainController {
 
         return skillPane;
     }
-
     private GridPane createSkillLevelSection
             (String skillLevel, Map<String, TextArea> describeMap,
              Map<String, TextArea> storyMap, Map<String, ComboBox<String>> typeMap) {
@@ -488,7 +504,6 @@ public class CharacterMainController {
 
         return levelPane;
     }
-
     private void addExtraSkills(VBox container){
         String extraSkillName = "额外神秘术_" + (System.currentTimeMillis());
         //System.currentTimeMillis()可以创建当前事件的时间戳，也就是显示创建时的时间字符串
@@ -518,6 +533,7 @@ public class CharacterMainController {
                     skillTypeFields.remove(extraSkillName);
                 });
     }
+
 
     private GridPane createAttributesInformationTab(){
         GridPane content = new GridPane();
@@ -558,7 +574,6 @@ public class CharacterMainController {
 
         return content;
     }
-
     private TextField createAttributeField(int maxValue,int minValue){
         if (minValue > maxValue){
             throw new IllegalArgumentException("最大限制小于最小限制");
@@ -591,6 +606,7 @@ public class CharacterMainController {
                 });
         return field;
     }
+
 
     private ScrollPane createProgressionInformationTab(){
         GridPane content = new GridPane();
@@ -680,6 +696,7 @@ public class CharacterMainController {
         return scrollPane;
     }
 
+
     private GridPane createUsedTermInformationTab(){
         GridPane content = new GridPane();
         content.setHgap(10);
@@ -718,7 +735,6 @@ public class CharacterMainController {
         content.add(scrollPane,0,currentRow,2,1);
         return content;
     }
-
     private void addNewUsedTerm(VBox container) {
         String newUsedTermName = "专有名词" + System.currentTimeMillis();
         GridPane usedTermPane = new GridPane();
@@ -759,6 +775,7 @@ public class CharacterMainController {
             usedTermDescribeFields.remove(newUsedTermName);
         });
     }
+
 
     private GridPane createEuphoriaInformationTab(){
         GridPane content = new GridPane();
@@ -852,31 +869,31 @@ public class CharacterMainController {
         row++;
         // 生命值加成
         Label healthLabel = new Label("生命值");
-        TextField healthField = createAttributeField(1000, -1000);
+        TextField healthField = createAttributeField(30000, 0);
         euphoriaPane.add(healthLabel, 0, row);
         euphoriaPane.add(healthField, 1, row);
         row++;
         // 攻击力加成
         Label attackLabel = new Label("攻击力");
-        TextField attackField = createAttributeField(500, -500);
+        TextField attackField = createAttributeField(2000, 0);
         euphoriaPane.add(attackLabel, 0, row);
         euphoriaPane.add(attackField, 1, row);
         row++;
         // 现实防御加成
         Label realityDefenseLabel = new Label("现实防御");
-        TextField realityDefenseField = createAttributeField(300, -300);
+        TextField realityDefenseField = createAttributeField(2000, 0);
         euphoriaPane.add(realityDefenseLabel, 0, row);
         euphoriaPane.add(realityDefenseField, 1, row);
         row++;
         // 精神防御加成
         Label mentalDefenseLabel = new Label("精神防御");
-        TextField mentalDefenseField = createAttributeField(300, -300);
+        TextField mentalDefenseField = createAttributeField(2000, 0);
         euphoriaPane.add(mentalDefenseLabel, 0, row);
         euphoriaPane.add(mentalDefenseField, 1, row);
         row++;
         // 暴击技巧加成
         Label techniqueLabel = new Label("暴击技巧");
-        TextField techniqueField = createAttributeField(200, -200);
+        TextField techniqueField = createAttributeField(2000, 0);
         euphoriaPane.add(techniqueLabel, 0, row);
         euphoriaPane.add(techniqueField, 1, row);
         row++;
@@ -933,6 +950,358 @@ public class CharacterMainController {
         euphoriaAttributesFields.remove(euphoriaId);
     }
 
+
+    private ScrollPane createOtherInformationTab() {
+        GridPane content = new GridPane();
+        content.setHgap(10);
+        content.setVgap(15);
+        content.setPadding(new Insets(20));
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setHgrow(Priority.NEVER);
+        col1.setPrefWidth(120);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setHgrow(Priority.ALWAYS);
+        col2.setPrefWidth(400);
+        content.getColumnConstraints().addAll(col1, col2);
+
+        int currentRow = 0;
+        // 封面信息部分
+        Label coverInformationTitle = new Label("封面信息");
+        coverInformationTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        content.add(coverInformationTitle, 0, currentRow, 2, 1);
+        currentRow++;
+
+        // 角色介绍
+        Label introductionLabel = new Label("角色介绍");
+        TextArea introductionArea = new TextArea();
+        introductionArea.setPromptText("请输入角色背景介绍");
+        introductionArea.setPrefRowCount(4);
+        introductionArea.setWrapText(true);
+        characterCoverInformationFields.put("introduction", introductionArea);
+        content.add(introductionLabel, 0, currentRow);
+        content.add(introductionArea, 1, currentRow);
+        currentRow++;
+        // 角色尺寸
+        Label sizeLabel = new Label("角色尺寸");
+        TextArea sizeArea = new TextArea();
+        sizeArea.setPromptText("例如：");
+        sizeArea.setWrapText(true);
+        sizeArea.setPrefRowCount(1);
+        characterCoverInformationFields.put("size", sizeArea);
+        content.add(sizeLabel, 0, currentRow);
+        content.add(sizeArea, 1, currentRow);
+        currentRow++;
+
+        // 角色香调
+        Label fragranceLabel = new Label("角色香调");
+        TextArea fragranceArea = new TextArea();
+        fragranceArea.setPromptText("请输入角色香调描述");
+        fragranceArea.setPrefRowCount(2);
+        fragranceArea.setWrapText(true);
+        characterCoverInformationFields.put("fragrance", fragranceArea);
+        content.add(fragranceLabel, 0, currentRow);
+        content.add(fragranceArea, 1, currentRow);
+        currentRow++;
+
+        // 详细灵感
+        Label detailedAfflatusLabel = new Label("详细灵感");
+        TextArea detailedAfflatusArea = new TextArea();
+        detailedAfflatusArea.setPromptText("请输入更详细的灵感类型描述");
+        characterCoverInformationFields.put("detailedAfflatus", detailedAfflatusArea);
+        content.add(detailedAfflatusLabel, 0, currentRow);
+        content.add(detailedAfflatusArea, 1, currentRow);
+        currentRow++;
+
+        Label dressTitle = new Label("服装信息");
+        dressTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        content.add(dressTitle, 0, currentRow, 2, 1);
+        currentRow++;
+
+        Button addDressButton = new Button("+ 添加服装");
+        VBox dressContainer = new VBox(10);
+        dressContainer.setStyle("-fx-padding: 10px; -fx-border-color: #bdc3c7; -fx-border-width: 1;");
+
+        addDressButton.setOnAction(actionEvent -> addNewDress(dressContainer));
+        content.add(addDressButton, 0, currentRow, 2, 1);
+        currentRow++;
+
+        ScrollPane dressScrollPane = new ScrollPane(dressContainer);
+        dressScrollPane.setFitToWidth(true);
+        dressScrollPane.setPrefViewportHeight(150);
+        content.add(dressScrollPane, 0, currentRow, 2, 1);
+        currentRow++;
+
+        // 角色单品部分
+        Label itemsTitle = new Label("角色单品");
+        itemsTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        content.add(itemsTitle, 0, currentRow, 2, 1);
+        currentRow++;
+
+        Button addItemsButton = new Button("+ 添加角色单品");
+        VBox itemsContainer = new VBox(10);
+        itemsContainer.setStyle("-fx-padding: 10px; -fx-border-color: #bdc3c7; -fx-border-width: 1;");
+
+        addItemsButton.setOnAction(actionEvent -> addNewCharacterItems(itemsContainer));
+        content.add(addItemsButton, 0, currentRow, 2, 1);
+        currentRow++;
+
+        ScrollPane itemsScrollPane = new ScrollPane(itemsContainer);
+        itemsScrollPane.setFitToWidth(true);
+        itemsScrollPane.setPrefViewportHeight(200);
+        content.add(itemsScrollPane, 0, currentRow, 2, 1);
+        currentRow++;
+        // 角色文化部分 - 固定三个
+        Label storyTitle = new Label("角色文化");
+        storyTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        content.add(storyTitle, 0, currentRow, 2, 1);
+        currentRow++;
+
+        // 第一个文化
+        Label firstStoryNameLabel = new Label("第一个文化名称");
+        TextArea firstStoryNameArea = new TextArea();
+        firstStoryNameArea.setPromptText("请输入第一个文化名称");
+        firstStoryNameArea.setWrapText(true);
+        firstStoryNameArea.setPrefRowCount(1);
+        content.add(firstStoryNameLabel, 0, currentRow);
+        content.add(firstStoryNameArea, 1, currentRow);
+        currentRow++;
+
+        Label firstStoryDescribeLabel = new Label("第一个文化描述");
+        TextArea firstStoryDescribeArea = new TextArea();
+        firstStoryDescribeArea.setPromptText("请输入第一个文化描述");
+        firstStoryDescribeArea.setPrefRowCount(3);
+        firstStoryDescribeArea.setWrapText(true);
+        content.add(firstStoryDescribeLabel, 0, currentRow);
+        content.add(firstStoryDescribeArea, 1, currentRow);
+        currentRow++;
+
+        // 第二个文化
+        Label secondStoryNameLabel = new Label("第二个文化名称");
+        TextArea secondStoryNameArea = new TextArea();
+        secondStoryNameArea.setPromptText("请输入第二个文化名称");
+        secondStoryNameArea.setPrefRowCount(1);
+        secondStoryNameArea.setWrapText(true);
+        content.add(secondStoryNameLabel, 0, currentRow);
+        content.add(secondStoryNameArea, 1, currentRow);
+        currentRow++;
+
+        Label secondStoryDescribeLabel = new Label("第二个文化描述");
+        TextArea secondStoryDescribeArea = new TextArea();
+        secondStoryDescribeArea.setPromptText("请输入第二个文化描述");
+        secondStoryDescribeArea.setPrefRowCount(3);
+        secondStoryDescribeArea.setWrapText(true);
+        content.add(secondStoryDescribeLabel, 0, currentRow);
+        content.add(secondStoryDescribeArea, 1, currentRow);
+        currentRow++;
+
+        // 第三个文化
+        Label thirdStoryNameLabel = new Label("第三个文化名称");
+        TextArea thirdStoryNameArea = new TextArea();
+        thirdStoryNameArea.setPromptText("请输入第三个文化名称");
+        thirdStoryNameArea.setPrefRowCount(1);
+        thirdStoryNameArea.setWrapText(true);
+        content.add(thirdStoryNameLabel, 0, currentRow);
+        content.add(thirdStoryNameArea, 1, currentRow);
+        currentRow++;
+
+        Label thirdStoryDescribeLabel = new Label("第三个文化描述");
+        TextArea thirdStoryDescribeArea = new TextArea();
+        thirdStoryDescribeArea.setPromptText("请输入第三个文化描述");
+        thirdStoryDescribeArea.setPrefRowCount(3);
+        thirdStoryDescribeArea.setWrapText(true);
+        content.add(thirdStoryDescribeLabel, 0, currentRow);
+        content.add(thirdStoryDescribeArea, 1, currentRow);
+        // 存储到Map中
+        Map<String, TextArea> storyNameMap = new HashMap<>();
+        storyNameMap.put("first", firstStoryNameArea);
+        storyNameMap.put("second", secondStoryNameArea);
+        storyNameMap.put("third", thirdStoryNameArea);
+        characterStoryFields.put("names", storyNameMap);
+
+        Map<String, TextArea> storyDescribeMap = new HashMap<>();
+        storyDescribeMap.put("first", firstStoryDescribeArea);
+        storyDescribeMap.put("second", secondStoryDescribeArea);
+        storyDescribeMap.put("third", thirdStoryDescribeArea);
+        characterStoryFields.put("describes", storyDescribeMap);
+
+        ScrollPane mainScrollPane = new ScrollPane(content);
+        mainScrollPane.setFitToWidth(true);
+        mainScrollPane.setPrefViewportHeight(500);
+        mainScrollPane.setStyle("-fx-background: white; -fx-border-color: #bdc3c7;");
+
+        return mainScrollPane;
+    }
+    private void addNewDress(VBox container) {
+        String dressId = "dress_" + System.currentTimeMillis();
+
+        GridPane dressPane = new GridPane();
+        dressPane.setHgap(10);
+        dressPane.setVgap(8);
+        dressPane.setPadding(new Insets(10));
+        dressPane.setStyle("-fx-border-color: #d5dbdb; -fx-border-width: 1; -fx-background-color: #f4f6f6;");
+
+        int row = 0;
+
+        Label nameLabel = new Label("衣着名称");
+        TextField nameField = new TextField();
+        nameField.setPromptText("请输入衣着名称");
+
+        dressPane.add(nameLabel, 0, row);
+        dressPane.add(nameField, 1, row);
+        row++;
+
+        Button deleteButton = new Button("删除此衣着");
+        deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+        dressPane.add(deleteButton, 0, row, 2, 1);
+        GridPane.setHalignment(deleteButton, HPos.RIGHT);
+
+        VBox dressContainer = new VBox(5, dressPane);
+        container.getChildren().add(dressContainer);
+
+        // 存储到Map中
+        dressNameFields.put(dressId, nameField);
+
+        deleteButton.setOnAction(actionEvent -> {
+            container.getChildren().remove(dressContainer);
+            dressNameFields.remove(dressId);
+        });
+    }
+    private void addNewCharacterItems(VBox container) {
+        String itemsId = "items_" + System.currentTimeMillis();
+
+        GridPane itemsPane = new GridPane();
+        itemsPane.setHgap(10);
+        itemsPane.setVgap(12);
+        itemsPane.setPadding(new Insets(15));
+        itemsPane.setStyle("-fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-background-color: #ecf0f1;");
+
+        int row = 0;
+
+        // 所属装扮名称
+        Label dressNameLabel = new Label("所属装扮名称");
+        TextArea dressNameArea = new TextArea();
+        dressNameArea.setPromptText("请输入所属装扮名称");
+        dressNameArea.setPrefRowCount(1);
+        dressNameArea.setWrapText(true);
+        itemsPane.add(dressNameLabel, 0, row);
+        itemsPane.add(dressNameArea, 1, row);
+        row++;
+
+        // 第一个单品
+        Label firstItemLabel = new Label("第一个单品名称");
+        TextArea firstItemNameArea = new TextArea();
+        firstItemNameArea.setPromptText("请输入第一个单品名称");
+        firstItemNameArea.setPrefRowCount(1);
+        firstItemNameArea.setWrapText(true);
+        itemsPane.add(firstItemLabel, 0, row);
+        itemsPane.add(firstItemNameArea, 1, row);
+        row++;
+
+        Label firstItemDescribeLabel = new Label("第一个单品描述");
+        TextArea firstItemDescribeArea = new TextArea();
+        firstItemDescribeArea.setPromptText("请输入第一个单品描述");
+        firstItemDescribeArea.setPrefRowCount(2);
+        firstItemDescribeArea.setWrapText(true);
+        itemsPane.add(firstItemDescribeLabel, 0, row);
+        itemsPane.add(firstItemDescribeArea, 1, row);
+        row++;
+
+        Label firstItemPriceLabel = new Label("第一个单品价格");
+        TextArea firstItemPriceArea = new TextArea();
+        firstItemPriceArea.setPromptText("请输入第一个单品价格");
+        firstItemPriceArea.setPrefRowCount(1);
+        firstItemPriceArea.setWrapText(true);
+        itemsPane.add(firstItemPriceLabel, 0, row);
+        itemsPane.add(firstItemPriceArea, 1, row);
+        row++;
+
+        // 第二个单品
+        Label secondItemLabel = new Label("第二个单品名称");
+        TextArea secondItemNameArea = new TextArea();
+        secondItemNameArea.setPromptText("请输入第二个单品名称");
+        secondItemNameArea.setPrefRowCount(1);
+        secondItemNameArea.setWrapText(true);
+        itemsPane.add(secondItemLabel, 0, row);
+        itemsPane.add(secondItemNameArea, 1, row);
+        row++;
+
+        Label secondItemDescribeLabel = new Label("第二个单品描述");
+        TextArea secondItemDescribeArea = new TextArea();
+        secondItemDescribeArea.setPromptText("请输入第二个单品描述");
+        secondItemDescribeArea.setPrefRowCount(2);
+        secondItemDescribeArea.setWrapText(true);
+        itemsPane.add(secondItemDescribeLabel, 0, row);
+        itemsPane.add(secondItemDescribeArea, 1, row);
+        row++;
+
+        Label secondItemPriceLabel = new Label("第二个单品价格");
+        TextArea secondItemPriceArea = new TextArea();
+        secondItemPriceArea.setPromptText("请输入第二个单品价格");
+        secondItemPriceArea.setPrefRowCount(1);
+        secondItemPriceArea.setWrapText(true);
+        itemsPane.add(secondItemPriceLabel, 0, row);
+        itemsPane.add(secondItemPriceArea, 1, row);
+        row++;
+
+        // 第三个单品
+        Label thirdItemLabel = new Label("第三个单品名称");
+        TextArea thirdItemNameArea = new TextArea();
+        thirdItemNameArea.setPromptText("请输入第三个单品名称");
+        thirdItemNameArea.setPrefRowCount(1);
+        thirdItemNameArea.setWrapText(true);
+        itemsPane.add(thirdItemLabel, 0, row);
+        itemsPane.add(thirdItemNameArea, 1, row);
+        row++;
+
+        Label thirdItemDescribeLabel = new Label("第三个单品描述");
+        TextArea thirdItemDescribeArea = new TextArea();
+        thirdItemDescribeArea.setPromptText("请输入第三个单品描述");
+        thirdItemDescribeArea.setPrefRowCount(2);
+        thirdItemDescribeArea.setWrapText(true);
+        itemsPane.add(thirdItemDescribeLabel, 0, row);
+        itemsPane.add(thirdItemDescribeArea, 1, row);
+        row++;
+
+        Label thirdItemPriceLabel = new Label("第三个单品价格");
+        TextArea thirdItemPriceArea = new TextArea();
+        thirdItemPriceArea.setPromptText("请输入第三个单品价格");
+        thirdItemPriceArea.setPrefRowCount(1);
+        thirdItemPriceArea.setWrapText(true);
+        itemsPane.add(thirdItemPriceLabel, 0, row);
+        itemsPane.add(thirdItemPriceArea, 1, row);
+        row++;
+
+        Button deleteButton = new Button("删除此角色单品");
+        deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+        itemsPane.add(deleteButton, 0, row, 2, 1);
+        GridPane.setHalignment(deleteButton, HPos.RIGHT);
+
+        VBox itemsContainer = new VBox(5, itemsPane);
+        container.getChildren().add(itemsContainer);
+
+        // 存储到Map中
+        Map<String, TextArea> itemsMap = new HashMap<>();
+
+        itemsMap.put("dressNameArea", dressNameArea);
+        itemsMap.put("firstItemNameArea", firstItemNameArea);
+        itemsMap.put("secondItemNameArea", secondItemNameArea);
+        itemsMap.put("thirdItemNameArea", thirdItemNameArea);
+        itemsMap.put("firstItemDescribeArea", firstItemDescribeArea);
+        itemsMap.put("secondItemDescribeArea", secondItemDescribeArea);
+        itemsMap.put("thirdItemDescribeArea", thirdItemDescribeArea);
+        itemsMap.put("firstItemPriceArea", firstItemPriceArea);  // 注意这是TextField
+        itemsMap.put("secondItemPriceArea", secondItemPriceArea);
+        itemsMap.put("thirdItemPriceArea", thirdItemPriceArea);
+
+        characterItemsFields.put(itemsId, itemsMap);
+
+        deleteButton.setOnAction(actionEvent -> {
+            container.getChildren().remove(itemsContainer);
+            characterItemsFields.remove(itemsId);
+        });
+    }
+
     private void showAlert(String title, String message, Alert.AlertType type) {
         //写这个方法主要是为了方便新建提示框
         Alert alert = new Alert(type);
@@ -956,6 +1325,10 @@ public class CharacterMainController {
 
     public TextField getNameField() {
         return nameField;
+    }
+
+    public TextField getEnNameField() {
+        return enNameField;
     }
 
     public ComboBox<String> getAfflatusComboBox() {
@@ -1024,5 +1397,28 @@ public class CharacterMainController {
 
     public Map<String, TextArea> getUsedTermDescribeFields() {
         return usedTermDescribeFields;
+    }
+    public Map<String, TextArea> getCharacterCoverInformationFields() {
+        return characterCoverInformationFields;
+    }
+
+    public Map<String, TextField> getDressNameFields() {
+        return dressNameFields;
+    }
+
+    public Map<String, Map<String, TextArea>> getCharacterItemsFields() {
+        return characterItemsFields;
+    }
+
+    public Map<String, Map<String, TextArea>> getCharacterStoryFields() {
+        return characterStoryFields;
+    }
+
+    public Map<String, Map<String, TextArea>> getEuphoriaDescribeFields() {
+        return euphoriaDescribeFields;
+    }
+
+    public Map<String, Map<String, TextField>> getEuphoriaAttributesFields() {
+        return euphoriaAttributesFields;
     }
 }
