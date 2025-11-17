@@ -49,6 +49,11 @@ public class Validator {
             controller.getDamageTypeComboBox().requestFocus();
             return false;
         }
+        if (controller.getCreatorField().getText() == null || controller.getCreatorField().getText().trim().isEmpty()){
+            showValidationAlert("创作者名称不能为空");
+            controller.getCreatorField().requestFocus();
+            return false;
+        }
 
         if (controller.getIdField().getText() == null || controller.getIdField().getText().trim().isEmpty()) {
             showValidationAlert("角色ID不能为空");

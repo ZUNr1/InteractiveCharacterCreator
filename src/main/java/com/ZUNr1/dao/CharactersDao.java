@@ -50,13 +50,14 @@ public class CharactersDao {
     private Characters convertFromJson(JsonDataLoader.CharactersJson json) {
         //把json格式的对象转为Characters角色
         Characters.CharactersBuilder charactersBuilder =
-                new Characters.CharactersBuilder(json.id, json.name, json.gender);
+                new Characters.CharactersBuilder(json.id, json.name, json.gender,json.isCustom, json.creator);
         charactersBuilder.afflatus(json.afflatus).
                 attributes(json.attributes).
                 damageType(json.damageType).
                 rarity(json.rarity).
                 inheritance(json.inheritance).
                 portrait(json.portrait).
+                euphoria(json.euphoria).
                 skills(json.skills).
                 usedTerm(json.usedTerm).
                 otherInformation(json.otherInformation);
@@ -83,11 +84,14 @@ public class CharactersDao {
             json.id = character.getId();
             json.name = character.getName();
             json.gender = character.getGender();
+            json.isCustom = character.isCustom();
+            json.creator = character.getCreator();
             json.afflatus = character.getAfflatus();
             json.attributes = character.getAttributes();
             json.damageType = character.getDamageType();
             json.inheritance = character.getInheritance();
             json.portrait = character.getPortrait();
+            json.euphoria = character.getEuphoria();
             json.rarity = character.getRarity();
             json.skills = character.getSkills();
             json.usedTerm = character.getUsedTerm();

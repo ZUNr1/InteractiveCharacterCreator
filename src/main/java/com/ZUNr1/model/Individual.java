@@ -12,6 +12,8 @@ public abstract class Individual {
     //注意，protected修饰的字段同一个包里面也可以访问，
     // 但是以后可能分包，所以在CharactersManage里面还是用getter方法
     protected String name;
+    protected boolean isCustom;
+    protected String creator;
     protected Gender gender;
     protected Afflatus afflatus;
     protected DamageType damageType;
@@ -62,6 +64,14 @@ public abstract class Individual {
         return skills;
     }
 
+    public boolean isCustom() {
+        return isCustom;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
     @Override
     public boolean equals(Object obj) {//equals编写先检查是不是本身，再看是不是空，，再看是不是同一类
         if (this == obj) {
@@ -89,6 +99,8 @@ public abstract class Individual {
         protected String id;
         //同样protected主要方便子类的Builder使用
         protected String name;
+        protected boolean isCustom;
+        protected String creator;
         protected Gender gender;
         protected Afflatus afflatus;
         protected DamageType damageType;
@@ -96,11 +108,13 @@ public abstract class Individual {
         protected Skills skills;
         protected List<String> usedTerm;
 
-        public Builder(String id, String name, Gender gender) {
-            validate(id, name);
+        public Builder(String id, String name, Gender gender,boolean isCustom,String creator) {
+            validate(id, name,creator);
             this.gender = gender;
             this.id = id;
             this.name = name.trim();
+            this.isCustom = isCustom;
+            this.creator = creator;
         }
 
         public abstract Builder attributes(Attributes attributes);
@@ -115,7 +129,7 @@ public abstract class Individual {
 
         public abstract Individual build();
 
-        private void validate(String id, String name) {
+        private void validate(String id, String name,String creator) {
 
             if (id == null || id.trim().isEmpty()) {
                 throw new IllegalArgumentException("id不能为空");
@@ -128,6 +142,12 @@ public abstract class Individual {
             }
             if (name.trim().length() > 20) {//注意啊，要验证的是去除空格后的长度
                 throw new IllegalArgumentException("姓名长度不能超过20位");
+            }
+            if (creator == null || creator.trim().isEmpty()){
+                throw new IllegalArgumentException("创作者名称不能为空");
+            }
+            if (creator.trim().length() > 20){
+                throw new IllegalArgumentException("创作者名称太长");
             }
         }
     }

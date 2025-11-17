@@ -54,6 +54,8 @@ public class JsonDataLoader {
         public String id;
         public String name;
         public Gender gender;
+        public boolean isCustom;
+        public String creator;
         public Afflatus afflatus;
         public DamageType damageType;
         public Attributes attributes;
@@ -61,6 +63,7 @@ public class JsonDataLoader {
         public List<String> usedTerm;
         public Inheritance inheritance;
         public Portrait portrait;
+        public List<Euphoria> euphoria;
         public OtherInformation otherInformation;
         public int rarity;
     }

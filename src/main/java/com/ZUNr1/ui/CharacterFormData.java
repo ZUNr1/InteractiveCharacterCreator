@@ -12,6 +12,8 @@ public class CharacterFormData {
     // 基本信息
     private String id;
     private String name;
+    private boolean isCustom;
+    private String creator;
     private Gender gender;
     private Afflatus afflatus;
     private DamageType damageType;
@@ -50,6 +52,14 @@ public class CharacterFormData {
 
     // 构造器
     public CharacterFormData() {}
+
+    public boolean isCustom() {
+        return isCustom;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
 
     public String getId() {
         return id;
@@ -156,6 +166,14 @@ public class CharacterFormData {
 
     public Map<String, String> getUsedTerms() {
         return usedTerms;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public void setCustom(boolean custom) {
+        isCustom = custom;
     }
 
     public void setId(String id) {

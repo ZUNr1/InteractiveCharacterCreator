@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Stack;
 
 public class CharacterMainController {
     private BorderPane root;
@@ -20,6 +19,7 @@ public class CharacterMainController {
     // 基本信息
     private TextField idField;
     private TextField nameField;
+    private TextField creatorField;
     private ComboBox<String> genderComboBox;
     private ComboBox<String> afflatusComboBox;
     private ComboBox<String> damageTypeComboBox;
@@ -44,6 +44,9 @@ public class CharacterMainController {
 
     private Map<String,TextField> usedTermNameFields = new HashMap<>();
     private Map<String,TextArea> usedTermDescribeFields = new HashMap<>();
+
+    private Map<String,Map<String,TextArea>> euphoriaDescribeFields = new HashMap<>();
+    private Map<String,Map<String,TextField>> euphoriaAttributesFields = new HashMap<>();
 
     public CharacterMainController(){
         createInterface();
@@ -75,17 +78,20 @@ public class CharacterMainController {
         attributesInformationTab.setContent(createAttributesInformationTab());
         attributesInformationTab.setClosable(false);
         //包含属性
-        Tab otherInformationTab = new Tab("塑造与传承");
-        otherInformationTab.setContent(createOtherInformationTab());
-        otherInformationTab.setClosable(false);
+        Tab ProgressionInformationTab = new Tab("塑造与传承");
+        ProgressionInformationTab.setContent(createProgressionInformationTab());
+        ProgressionInformationTab.setClosable(false);
         //包含Portrait和Inheritance
         Tab usedTermInformationTab = new Tab("专有名词");
         usedTermInformationTab.setContent(createUsedTermInformationTab());
         usedTermInformationTab.setClosable(false);
         //包含usedTerm
+        Tab euphoriaInformationTab = new Tab("狂想");
+        euphoriaInformationTab.setContent(createEuphoriaInformationTab());
         tabPane.getTabs().addAll
                 (basicInformationTab,skillInformationTab,attributesInformationTab,
-                        otherInformationTab,usedTermInformationTab);
+                        ProgressionInformationTab,usedTermInformationTab,
+                        euphoriaInformationTab);
         //这一行获得所有标签然后添加所有我们要加的标签
         root.setCenter(tabPane);
 
@@ -239,6 +245,16 @@ public class CharacterMainController {
         Label titleLabel = new Label("角色基本信息");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        Label creatorLabel = new Label("创作者名称");
+        creatorField = new TextField();
+        creatorField.setPromptText("请输入你的名称(不要超过20个字符)");
+        creatorField.textProperty().addListener((observable,oldValue,newValue) -> {
+            if (newValue.length() > 20){
+                creatorField.setText(newValue.substring(0,20));
+            }
+        });
+
+
         Label idLabel = new Label("角色id");
         idField = new TextField();
         idField.setPromptText("请输入角色id（最多10个字符）");
@@ -306,6 +322,8 @@ public class CharacterMainController {
         content.add(afflatusComboBox,1,5);
         content.add(damageTypeLabel,0,6);
         content.add(damageTypeComboBox,1,6);
+        content.add(creatorLabel,0,7);
+        content.add(creatorField,1,7);
         return content;
     }
 
@@ -574,7 +592,7 @@ public class CharacterMainController {
         return field;
     }
 
-    private ScrollPane createOtherInformationTab(){
+    private ScrollPane createProgressionInformationTab(){
         GridPane content = new GridPane();
         content.setHgap(10);
         content.setVgap(15);
@@ -742,6 +760,179 @@ public class CharacterMainController {
         });
     }
 
+    private GridPane createEuphoriaInformationTab(){
+        GridPane content = new GridPane();
+        content.setHgap(10);
+        content.setVgap(15);
+        content.setPadding(new Insets(20));
+        content.setStyle("-fx-padding: 20px;");
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setHgrow(Priority.NEVER);
+        col1.setPrefWidth(100);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setHgrow(Priority.NEVER);
+        col2.setPrefWidth(300);
+        content.getColumnConstraints().addAll(col1, col2);
+
+        int currentRow = 0;
+        Label titleLabel = new Label("狂想(如果有)");
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        content.add(titleLabel,0,currentRow);
+        currentRow++;
+
+        Button addEuphoriaButton = new Button("添加新狂想");
+        content.add(addEuphoriaButton,0,currentRow);
+        currentRow++;
+        VBox euphoriaContainer = new VBox(10);
+        euphoriaContainer.setStyle("-fx-padding: 10px; -fx-border-color: #bdc3c7; -fx-border-width: 1;");
+        addEuphoriaButton.setOnAction(actionEvent -> addNewEuphoria(euphoriaContainer));
+        //每一次点击，创建一个GirdPane，，用VBox包装，添加进euphoriaContainer里面
+
+        ScrollPane scrollPane = new ScrollPane(euphoriaContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportHeight(350);
+        //ScrollPane：让内容可以上下滚动，可能会超限，我们使用滚动布局把设置的VBox包含进去
+        //setFitToWidth(true)：内容自动适应宽度
+        //setPrefViewportHeight(350)：设置可见区域高度为350像素
+        scrollPane.setStyle("-fx-background: white; -fx-border-color: #bdc3c7; -fx-border-width: 1;");
+        content.add(scrollPane,0,currentRow,2,1);
+        return content;
+
+    }
+    private void addNewEuphoria(VBox container){
+        String newEuphoriaName = "狂想 _ " + System.currentTimeMillis();
+        GridPane euphoriaPane = new GridPane();
+        euphoriaPane.setHgap(10);
+        euphoriaPane.setVgap(12);
+        euphoriaPane.setPadding(new Insets(15));
+        euphoriaPane.setStyle("-fx-border-color: #bdc3c7; -fx-border-width: 1; -fx-background-color: #ecf0f1;");
+        int row = 0;
+        Label euphoriaNameLabel = new Label("狂想名称");
+        TextField euphoriaNameField = new TextField();
+        euphoriaPane.add(euphoriaNameLabel,0,row);
+        euphoriaPane.add(euphoriaNameField,1,row);
+        row++;
+    // 一阶狂想
+        Label firstEuphoriaLabel = new Label("一阶狂想");
+        TextArea firstEuphoriaArea = new TextArea();
+        firstEuphoriaArea.setPrefRowCount(3);
+        firstEuphoriaArea.setWrapText(true);
+        euphoriaPane.add(firstEuphoriaLabel, 0, row);
+        euphoriaPane.add(firstEuphoriaArea, 1, row);
+        row++;
+    // 二阶狂想
+        Label secondEuphoriaLabel = new Label("二阶狂想");
+        TextArea secondEuphoriaArea = new TextArea();
+        secondEuphoriaArea.setPrefRowCount(3);
+        secondEuphoriaArea.setWrapText(true);
+        euphoriaPane.add(secondEuphoriaLabel, 0, row);
+        euphoriaPane.add(secondEuphoriaArea, 1, row);
+        row++;
+    // 三阶狂想
+        Label thirdEuphoriaLabel = new Label("三阶狂想");
+        TextArea thirdEuphoriaArea = new TextArea();
+        thirdEuphoriaArea.setPrefRowCount(3);
+        thirdEuphoriaArea.setWrapText(true);
+        euphoriaPane.add(thirdEuphoriaLabel, 0, row);
+        euphoriaPane.add(thirdEuphoriaArea, 1, row);
+        row++;
+    // 四阶狂想
+        Label fourthEuphoriaLabel = new Label("四阶狂想");
+        TextArea fourthEuphoriaArea = new TextArea();
+        fourthEuphoriaArea.setPrefRowCount(3);
+        fourthEuphoriaArea.setWrapText(true);
+        euphoriaPane.add(fourthEuphoriaLabel, 0, row);
+        euphoriaPane.add(fourthEuphoriaArea, 1, row);
+        row++;
+        // 属性加成标题
+        Label attributesTitle = new Label("属性加成");
+        attributesTitle.setStyle("-fx-font-weight: bold;");
+        euphoriaPane.add(attributesTitle, 0, row, 2, 1);
+        row++;
+        // 生命值加成
+        Label healthLabel = new Label("生命值");
+        TextField healthField = createAttributeField(1000, -1000);
+        euphoriaPane.add(healthLabel, 0, row);
+        euphoriaPane.add(healthField, 1, row);
+        row++;
+        // 攻击力加成
+        Label attackLabel = new Label("攻击力");
+        TextField attackField = createAttributeField(500, -500);
+        euphoriaPane.add(attackLabel, 0, row);
+        euphoriaPane.add(attackField, 1, row);
+        row++;
+        // 现实防御加成
+        Label realityDefenseLabel = new Label("现实防御");
+        TextField realityDefenseField = createAttributeField(300, -300);
+        euphoriaPane.add(realityDefenseLabel, 0, row);
+        euphoriaPane.add(realityDefenseField, 1, row);
+        row++;
+        // 精神防御加成
+        Label mentalDefenseLabel = new Label("精神防御");
+        TextField mentalDefenseField = createAttributeField(300, -300);
+        euphoriaPane.add(mentalDefenseLabel, 0, row);
+        euphoriaPane.add(mentalDefenseField, 1, row);
+        row++;
+        // 暴击技巧加成
+        Label techniqueLabel = new Label("暴击技巧");
+        TextField techniqueField = createAttributeField(200, -200);
+        euphoriaPane.add(techniqueLabel, 0, row);
+        euphoriaPane.add(techniqueField, 1, row);
+        row++;
+        Button deleteButton = new Button("删除");
+        deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
+        euphoriaPane.add(deleteButton, 0, row,2,1);
+        GridPane.setHalignment(deleteButton, HPos.RIGHT);
+        row++;
+
+        VBox euphoriaContainer = new VBox(5, euphoriaPane);
+        container.getChildren().add(euphoriaContainer);
+
+        storeEuphoriaData(newEuphoriaName, euphoriaNameField,
+                healthField, attackField, realityDefenseField,
+                mentalDefenseField, techniqueField,
+                firstEuphoriaArea, secondEuphoriaArea,
+                thirdEuphoriaArea, fourthEuphoriaArea);
+
+        deleteButton.setOnAction(actionEvent -> {
+            container.getChildren().remove(euphoriaContainer);
+            removeEuphoriaData(newEuphoriaName);
+        });
+
+
+    }
+    private void storeEuphoriaData(String euphoriaId, TextField nameField,
+                                   TextField healthField, TextField attackField,
+                                   TextField realityDefenseField, TextField mentalDefenseField,
+                                   TextField techniqueField, TextArea firstEuphoriaArea,
+                                   TextArea secondEuphoriaArea, TextArea thirdEuphoriaArea,
+                                   TextArea fourthEuphoriaArea) {
+
+        // 存储描述字段
+        Map<String, TextArea> describeMap = new HashMap<>();
+        describeMap.put("first", firstEuphoriaArea);
+        describeMap.put("second", secondEuphoriaArea);
+        describeMap.put("third", thirdEuphoriaArea);
+        describeMap.put("fourth", fourthEuphoriaArea);
+        euphoriaDescribeFields.put(euphoriaId, describeMap);
+
+        // 存储属性字段
+        Map<String, TextField> attributesMap = new HashMap<>();
+        attributesMap.put("name", nameField); // 名称字段
+        attributesMap.put("health", healthField);
+        attributesMap.put("attack", attackField);
+        attributesMap.put("realityDefense", realityDefenseField);
+        attributesMap.put("mentalDefense", mentalDefenseField);
+        attributesMap.put("technique", techniqueField);
+        euphoriaAttributesFields.put(euphoriaId, attributesMap);
+    }
+
+    private void removeEuphoriaData(String euphoriaId) {
+        euphoriaDescribeFields.remove(euphoriaId);
+        euphoriaAttributesFields.remove(euphoriaId);
+    }
+
     private void showAlert(String title, String message, Alert.AlertType type) {
         //写这个方法主要是为了方便新建提示框
         Alert alert = new Alert(type);
@@ -753,6 +944,10 @@ public class CharacterMainController {
 
     public BorderPane getRoot() {
         return root;
+    }
+
+    public TextField getCreatorField() {
+        return creatorField;
     }
 
     public TextField getIdField() {

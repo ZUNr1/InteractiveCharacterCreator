@@ -10,6 +10,7 @@ import java.util.List;
 public final class Characters extends Individual {
     private Inheritance inheritance;
     private Portrait portrait;
+    private List<Euphoria> euphoria;
     private OtherInformation otherInformation;
     private int rarity;
 
@@ -20,6 +21,7 @@ public final class Characters extends Individual {
         //子类cB含有父类B的所有字段，是父类的具体实现，所以传入cB而不是B
         this.inheritance = charactersBuilder.inheritance;
         this.portrait = charactersBuilder.portrait;
+        this.euphoria = charactersBuilder.euphoria;
         this.otherInformation = charactersBuilder.otherInformation;
         this.rarity = charactersBuilder.rarity;
         //对额外字段赋值
@@ -31,6 +33,10 @@ public final class Characters extends Individual {
 
     public Portrait getPortrait() {
         return portrait;
+    }
+
+    public List<Euphoria> getEuphoria() {
+        return euphoria;
     }
 
     public OtherInformation getOtherInformation() {
@@ -47,11 +53,12 @@ public final class Characters extends Individual {
         //你想，我们要实例化外部类，构造器让我们用Builder，所以Builder一定是先于外部类实例化的
         private Inheritance inheritance;
         private Portrait portrait;
+        private List<Euphoria> euphoria;
         private OtherInformation otherInformation;
         private int rarity;
 
-        public CharactersBuilder(String id, String name, Gender gender) {
-            super(id, name, gender);
+        public CharactersBuilder(String id, String name, Gender gender,boolean isCustom,String creator) {
+            super(id, name, gender,isCustom,creator);
             //继承
         }
 
@@ -104,6 +111,11 @@ public final class Characters extends Individual {
 
         public CharactersBuilder portrait(Portrait portrait) {
             this.portrait = portrait;
+            return this;
+        }
+
+        public CharactersBuilder euphoria(List<Euphoria> euphoria) {
+            this.euphoria = euphoria;
             return this;
         }
 
