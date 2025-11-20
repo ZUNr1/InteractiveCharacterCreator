@@ -7,7 +7,10 @@ public class Attributes {
     private int mentalDefense;
     private int technique;
     // 添加无参构造函数（Jackson需要）
-    /*todo 搞明白为什么json反序列化需要无参构造器*/
+    //json反序列化的本质是：将一段文本（JSON字符串）转换成一个内存中的Java对象。
+    //他需要创建一个对象实例，但是问题是他不知道怎么构建一个对象实例
+    //我们要给他无参构造器来使用
+    //然后，json通过反射，找到对应字段，把数据填入进去
     public Attributes() {
         // Jackson会通过setter方法设置值
     }
