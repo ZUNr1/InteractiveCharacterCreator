@@ -170,6 +170,20 @@ public class CharacterManage {
         }
         return list;
     }
+    public List<Characters> findByEnName(String enName){
+        if (enName == null || enName.trim().isEmpty()){
+            return new ArrayList<>();
+        }
+        String lowerEnName = enName.trim().toLowerCase();
+        List<Characters> list = new ArrayList<>();
+        for (Characters characters : charactersList){
+            String newCharactersEnName = characters.getEnName().toLowerCase().trim();
+            if (newCharactersEnName.contains(lowerEnName)){
+                list.add(characters);
+            }
+        }
+        return list;
+    }
     public Characters findByNameExact(String name) {
         if (name == null || name.trim().isEmpty()) {
             return null;

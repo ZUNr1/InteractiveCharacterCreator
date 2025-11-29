@@ -93,46 +93,9 @@ public class CharacterMainController {
         HBox buttonBox = createButtonBox();
         root.setBottom(buttonBox);
 
-        setUpWindowsCloseHandle();
-        //设置关闭窗口时的操作
     }
-    private void setUpWindowsCloseHandle(){
-        Platform.runLater(() -> {
-            // 这行代码的意思是："等当前代码执行完后，在JavaFX应用线程中执行括号里的代码"
-            //"当前代码"指的是调用 setupWindowCloseHandler() 方法的代码。
-            // - 在构造函数中，root可能还没有被添加到Scene
-            // - 在Scene显示之前，getScene()可能返回null
-            // - runLater确保在界面完全初始化后再执行
-        Stage stage = (Stage)root.getScene().getWindow();
-        // 这时候root已经确定在Scene中了，所以getScene()不会返回null
-        stage.setOnCloseRequest(event -> {
-            // 设置窗口关闭事件监听器
-            // 当用户点击窗口的X按钮时，会触发这个事件
-            event.consume();
-            //这是阻止事件的默认执行，默认是关闭程序，我们阻止，然后才能运行后面的代码显示提示框
-            showExitConfirmation();
-            //这是执行操作，我们在里面实现显示提示框与关闭程序
-        });
-        });
 
-    }
-    private void showExitConfirmation() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("退出程序");
-        alert.setHeaderText("真的要离开我吗 😢");
-        alert.setContentText("是否要退出程序？未保存的数据将会丢失。");
 
-        // 普通按钮版本（防止误按Enter）
-        ButtonType exitButton = new ButtonType("狠心离开");
-        ButtonType stayButton = new ButtonType("再陪陪你");
-        alert.getButtonTypes().setAll(exitButton, stayButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == exitButton) {
-            Platform.exit(); // 退出程序
-        }
-        // 如果点击"再陪陪你"或关闭对话框，什么都不做（窗口保持打开）
-    }
     private HBox createButtonBox(){
         HBox buttonBox = new HBox(20);
         buttonBox.setPadding(new Insets(15));
