@@ -13,6 +13,7 @@ public final class Characters extends Individual {
     private List<Euphoria> euphoria;
     private OtherInformation otherInformation;
     private int rarity;
+    //图片不要放在后端模型中，放在数据库中就好
 
     //构造器传入的类型是父类Builder的子类实现CharacterBuilder，运用多态的思想
     private Characters(CharactersBuilder charactersBuilder) {

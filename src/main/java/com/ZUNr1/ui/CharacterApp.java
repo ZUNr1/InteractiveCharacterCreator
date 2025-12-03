@@ -1,7 +1,9 @@
 package com.ZUNr1.ui;
 
+import com.ZUNr1.config.DataBaseConfig;
 import com.ZUNr1.ui.controller.CharacterChangeController;
 import com.ZUNr1.ui.controller.CharacterMainController;
+import com.ZUNr1.util.DataBaseConnection;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -55,4 +57,12 @@ public class CharacterApp extends Application {
     private Parent createBasicInterface() {
         return new VBox();
     }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        DataBaseConnection.closeDataSource();
+        //一般会帮我们关闭数据库连接池的，但是我们还是要以防万一
+    }
 }
+

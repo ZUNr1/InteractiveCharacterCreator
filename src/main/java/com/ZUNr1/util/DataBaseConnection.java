@@ -1,5 +1,9 @@
 package com.ZUNr1.util;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,13 +11,13 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DataBaseConnection {
-    private static String url;
-    private static String username;
-    private static String password;
+    private static HikariDataSource dataSource;
     static{
         loadConfig();//static块为静态初始化块，在类加载的时候执行，且只执行一次
     }
     private static void loadConfig(){
+        // [学习记录] 这里原本使用DriverManager，现在升级为HikariCP连接池
+        // 原因：连接池提供更好的性能和管理能力
         try (InputStream input = DataBaseConnection.class.getClassLoader()
                 .getResourceAsStream("db.properties")){
             if (input == null) {
@@ -25,34 +29,28 @@ public class DataBaseConnection {
             //Properties是键值对集合，键和值都必须是String
             properties.load(input);
             //Properties目的就是读取从配置文件吸收的流，把 key=value 格式的配置项加载到Properties对象中
-            url = properties.getProperty("db.url");
-            //getProperty就是获得配置中的键的对应的值，"db.url"就是键，读取到的就是值
-            username = properties.getProperty("db.username");
-            password = properties.getProperty("db.password");
-            String driver = properties.getProperty("db.driver");
-            //从 Properties 对象中获取数据库驱动类的完整类名
-            Class.forName(driver);
-            //根据传入的完整类名字符串，动态加载这个类到 JVM 中，就是启动jvm的类加载器
-            //它会触发该类的静态初始化块（就是static块）执行，这里就是对应了db.driver指示的类
-            //jdbc不知道要使用的是什么数据库，类里面静态代码块有驱动注册：把自己注册到JDBC驱动管理器中
-            //在MySQL驱动中，静态代码块会调用：DriverManager.registerDriver(new Driver())
+            HikariConfig config = new HikariConfig(properties);
+            //这个方法可以解析配置文件转换为数据库连接池认识的配置数据源，
+            //db.properties存储了HikariCP数据库连接池所必须的配置，如密码等
+            dataSource = new HikariDataSource(config);
+            //使用翻译后的配置，初始化
+
 
         }catch (Exception e){
             throw new RuntimeException("数据库配置加载失败：" + e.getMessage(),e);
         }
     }
+
     public static Connection getConnection() throws SQLException{
-        //DriverManager 是JDBC的核心类，负责：
-        //管理所有已注册的数据库驱动
-        //根据URL选择合适的驱动
-        //建立实际的数据库连接
-        return DriverManager.getConnection(url,username,password);
-        //我们告诉DriverManager链接的数据库的信息
-        //前面的静态代码块我们实现了驱动的注册，在使用这个静态方法的时候类已经加载了，完成了驱动的注册
-        //这个时候，getConnection方法中，jdbc的会遍历所有注册的驱动，
-        //看看有没有认识这个url的数据库驱动，调用每个驱动的 acceptsURL(url) 方法，询问是否能处理这个URL
-        //这样就找到mysql了
-        // 注意：这里可能会抛出SQLException，比如认证失败、网络连接问题等
+        return dataSource.getConnection();
+        //直接从连接池获取数据，不再像原本那样使用JDBC的DriverManager
+    }
+    public static void closeDataSource(){
+        if (dataSource != null && !dataSource.isClosed()){
+            dataSource.close();
+        }
+        //这个方法在一般情况下没有用，因为会自动关闭，但是我的是javafx桌面应用，要注意
+        //当程序正常结束的时候，会自动帮我们关闭数据库连接池，但是程序很可能不是正常结束，这个时候我们要在stop方法里面使用这个关闭代码
     }
     public static boolean testConnection(){
         //这就是一个简单的测试方法，测试有没有成功，外界先用这个测试，防止后续的业务错误覆盖这个SQLException错误
@@ -65,3 +63,4 @@ public class DataBaseConnection {
         }
     }
 }
+
